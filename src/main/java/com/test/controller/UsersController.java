@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
@@ -42,5 +43,23 @@ public class UsersController {
         }
 
         return new ResponseEntity<>("Customer has been deleted!", HttpStatus.OK);
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> putUser(@PathVariable("id") String id, @RequestBody Users users) {
+        System.out.println("Edit user password with ID = " + id + "...");
+        try {
+            Optional<Users> usersData = usersRepository.findById(id);
+            if(usersData.isPresent()) {
+                Users _users = usersData.get();
+                _users.setPassword(users.getPassword());
+                usersRepository.save(_users);
+                return new ResponseEntity<>("DONE", HttpStatus.OK);
+            } else {
+                throw new Exception(new Error("No ID"));
+            }
+        } catch(Exception e) {
+            return new ResponseEntity<>("No ID", HttpStatus.OK);
+        }
     }
 }
